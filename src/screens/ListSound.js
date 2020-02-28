@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { downloadFile } from '../service/audio';
 import Player from './Player';
+import RNFetchBlob from 'rn-fetch-blob';
 
 export default class ListSound extends Component {
   constructor(props) {
@@ -52,8 +53,26 @@ export default class ListSound extends Component {
 
   download = url => {
     console.warn('url', url);
+    downloadFile(url);
+    // .then(res =>
+    //   RNFetchBlob.fs.scanFile([{ path: res.path(), mime: 'audio/mpeg' }])
+    // )
+    // .then(respo => {
+    //   // scan file success
+    //   console.warn('foi');
+    //   console.log('The file saved to ', respo.path());
 
+    //   const NEW_FILE_PATH = RNFetchBlob.fs.dirs.CacheDir + '/teste.mp3';
+
+    //   RNFetchBlob.fs.writeFile(NEW_FILE_PATH, response);
+    // })
+    // .catch(err => {
+    //   // scan file error
+    //   console.warn('err', err);
+    // });
     // downloadFile(url).then(response => {
+    //   // RNFetchBlob.fs.writeFile(c, response, 'utf8');
+
     //   console.warn('response', response);
     // });
   };
@@ -83,7 +102,7 @@ export default class ListSound extends Component {
             </View>
             <TouchableOpacity
               onPress={() => {
-                this.download(item.uri);
+                this.download(item.sound);
               }}
               style={styles.containerIconDownload}
             >
@@ -116,9 +135,7 @@ export default class ListSound extends Component {
           animationType="slide"
           transparent={false}
           visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-          }}
+          onRequestClose={this.closeModal}
           style={{ marginTop: 40, flex: 1 }}
         >
           <View style={{ marginTop: 22, flex: 1 }}>
@@ -154,8 +171,12 @@ export default class ListSound extends Component {
             style={styles.imageInfo}
           />
           <View style={styles.containerTitle}>
-            <Text style={styles.titleInfo}>{`${this.title}`}</Text>
-            <Text style={styles.titleInfo}>{`${this.author}`}</Text>
+            <Text style={styles.titleInfo}>
+              {this.listSounds[position].title}
+            </Text>
+            <Text style={styles.titleInfo}>
+              {this.listSounds[position].author}
+            </Text>
           </View>
         </View>
         <ScrollView>{this.renderCell()}</ScrollView>

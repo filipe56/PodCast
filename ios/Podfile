@@ -7,6 +7,8 @@ target 'PodCast' do
 #1  # Pods for PodCast
   
 
+  pod 'rn-fetch-blob', :path => '../node_modules/rn-fetch-blob'
+
 end
 
 

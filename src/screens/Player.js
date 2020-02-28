@@ -144,6 +144,7 @@ export default class Player extends Component<Props> {
       listSounds,
       position,
     } = this.props;
+    console.warn('title', listSounds[indexSelected]);
 
     return (
       <View style={styles.container}>
@@ -207,8 +208,15 @@ export default class Player extends Component<Props> {
           </View>
         )}
         <Text
-          style={{ paddingBottom: 10, marginTop: 20, fontSize: 20 }}
-        >{`${name}`}</Text>
+          style={{
+            paddingBottom: 10,
+            marginTop: 20,
+            fontSize: 20,
+            color: 'black',
+          }}
+        >
+          {listSounds[indexSelected].title}
+        </Text>
         <Slider
           style={styles.playerSlider}
           thumbStyle={styles.playerThumb}
