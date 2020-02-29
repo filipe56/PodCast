@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
 import {
   Image,
-  Screen,
   Text,
   View,
   StyleSheet,
-  FlatList,
   Modal,
-  TouchableHighlight,
-  Alert,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
@@ -29,11 +25,9 @@ export default class ListSound extends Component {
       modalVisible: false,
       soundChoosed: { image: '' },
       position: 0,
+      music: '',
+      pathMusik: '',
     };
-
-    // console.warn('constructor - list 0', this.listSounds[0].uri);
-    // console.warn('constructor - list 1', this.listSounds[1].uri);
-    // console.warn('constructor - list 2', this.listSounds[2].uri);
   }
 
   static navigationOptions = {
@@ -46,42 +40,45 @@ export default class ListSound extends Component {
 
   openModal = (modalVisible, index) => {
     this.setState({ modalVisible, position: index });
-    // this.props.navigation.navigate('Player', {
-    //   title: 'nome do podCast',
-    // });
+  };
+
+  searchMusic = (PATH_TO_READ, index) => {
+    RNFetchBlob.fs
+      .readFile(PATH_TO_READ)
+      .then(() => {
+        this.listSounds[index] = {
+          ...this.listSounds[index],
+          sound: PATH_TO_READ,
+        };
+      })
+      .catch(error => {
+        console.log('error', error);
+      });
+  };
+
+  componentDidMount = () => {
+    this.hasSave();
+  };
+
+  hasSave = () => {
+    const PATH_DEFAULT = '/data/user/0/com.podcast/files/';
+    this.listSounds.forEach((element, index) => {
+      this.searchMusic(`${PATH_DEFAULT}${element.sound}`, index);
+    });
   };
 
   download = url => {
-    console.warn('url', url);
-    downloadFile(url);
-    // .then(res =>
-    //   RNFetchBlob.fs.scanFile([{ path: res.path(), mime: 'audio/mpeg' }])
-    // )
-    // .then(respo => {
-    //   // scan file success
-    //   console.warn('foi');
-    //   console.log('The file saved to ', respo.path());
-
-    //   const NEW_FILE_PATH = RNFetchBlob.fs.dirs.CacheDir + '/teste.mp3';
-
-    //   RNFetchBlob.fs.writeFile(NEW_FILE_PATH, response);
-    // })
-    // .catch(err => {
-    //   // scan file error
-    //   console.warn('err', err);
-    // });
-    // downloadFile(url).then(response => {
-    //   // RNFetchBlob.fs.writeFile(c, response, 'utf8');
-
-    //   console.warn('response', response);
-    // });
+    downloadFile(url)
+      .then(res => {
+        this.hasSave();
+      })
+      .catch(err => {
+        console.warn('The file err ', err);
+      });
   };
 
   renderCell() {
     const { modalVisible } = this.state;
-    // console.warn('this.listSound', this.listSounds[0].uri);
-    // console.warn('this.listSound', this.listSounds[1].uri);
-    // console.warn('this.listSound', this.listSounds[2].uri);
 
     return this.listSounds.map((item, index) => (
       <TouchableOpacity
@@ -127,6 +124,8 @@ export default class ListSound extends Component {
       position,
       soundChoosed,
       listSounds,
+      music,
+      pathMusik,
     } = this.state;
 
     return (
@@ -149,6 +148,8 @@ export default class ListSound extends Component {
               next={() => {
                 this.next(position);
               }}
+              music={music}
+              pathMusik={pathMusik}
             />
             {/* <Text>Hello World!</Text>
               <TouchableHighlight

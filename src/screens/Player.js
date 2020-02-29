@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
-  Button,
   Image,
   TouchableOpacity,
   Text,
@@ -10,17 +9,10 @@ import {
 } from 'react-native';
 import Video from 'react-native-video';
 import { Slider } from 'react-native-elements';
-import Icon from '../assets/index';
-// import moment from 'moment';
 
 export default class Player extends Component<Props> {
   constructor(props) {
     super(props);
-    this.listUri = [
-      'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4',
-      'https://s3.eu-west-3.amazonaws.com/evolum/beginner_1.mp3',
-      'https://m.toqueparacelular.com.br/n04/Star_Wars_Remix.mp3',
-    ];
 
     this.playIcon = require('../assets/play.png');
     this.pauseIcon = require('../assets/pause.png');
@@ -43,14 +35,9 @@ export default class Player extends Component<Props> {
       indexSelected: position,
       isLoading: false,
       velocity: 1,
+      timeCurrent: 0,
     };
   }
-
-  // componentDidMount = () => {
-  //   console.warn('position- didmount', position);
-
-  //   this.setState({ indexSelected: position });
-  // };
 
   play = () => {
     this.setState({ paused: false });
@@ -59,7 +46,6 @@ export default class Player extends Component<Props> {
   next = () => {
     const { listSounds } = this.props;
     const { indexSelected } = this.state;
-
     const hasPlusAudio = indexSelected < listSounds.length - 1;
 
     this.setState({ indexSelected: hasPlusAudio ? indexSelected + 1 : 0 });
@@ -68,7 +54,6 @@ export default class Player extends Component<Props> {
   back = () => {
     const { listSounds } = this.props;
     const { indexSelected } = this.state;
-
     const hasBackAudio = indexSelected > 0;
 
     this.setState({
@@ -81,24 +66,62 @@ export default class Player extends Component<Props> {
   };
 
   onEnd = () => {
-    const { value } = this.state;
-    this.setState({ value: value + 1 });
+    const { indexSelected } = this.state;
+    const { listSounds } = this.props;
+
+    if (indexSelected === listSounds.length - 1) {
+      this.setState({ indexSelected: 0, progress: 0, rate: 1 });
+    } else {
+      this.setState({ indexSelected: indexSelected + 1, progress: 0, rate: 1 });
+    }
   };
 
-  rate(rate) {
+  rate = rate => {
     this.setState({ rate, paused: false });
-  }
-
-  handleSongSliderChange = value => {
-    this.player.songSeekTo(value);
   };
+
+  // handleSongSliderChange = value => {
+  //   this.player.songSeekTo(value);
+  // };
 
   onProgress = data => {
-    this.setState({ progress: data.currentTime, minimumValue: data });
+    var timestamp = data.currentTime;
+    var hours = Math.floor(timestamp / 60 / 60);
+    var minutes = Math.floor(timestamp / 60) - hours * 60;
+    var seconds = timestamp % 60;
+    let time = '0';
+
+    if (hours > 0 && hours < 10) {
+      time = `0${hours}:00:00`;
+    } else if (hours > 9) {
+      time = `${hours}:${minutes}:00`;
+    }
+
+    if (minutes > 0 && minutes < 10) {
+      time = `${hours}:0${minutes}:00`;
+    } else if (minutes > 9) {
+      time = `${hours}:${minutes}:00`;
+    }
+
+    if (seconds > 0 && minutes < 10) {
+      let secondsWithoutMiliseconds = `${seconds}`.slice(0, 1);
+      time = `${hours}:${minutes}:0${secondsWithoutMiliseconds}`;
+    } else if (minutes > 9) {
+      console.warn('foi');
+
+      let secondsWithoutMiliseconds = `${seconds}`.slice(0, 2);
+      time = `${hours}:${minutes}:${secondsWithoutMiliseconds}`;
+    }
+
+    this.setState({
+      progress: timestamp,
+      minimumValue: data,
+      timeCurrent: time,
+    });
   };
 
   onLoad = data => {
-    // console.warn('onLoad');
+    console.warn('onLoad');
     this.setState({ duration: data.duration, isLoading: false });
   };
 
@@ -111,15 +134,15 @@ export default class Player extends Component<Props> {
   plus = () => {
     const { velocity } = this.state;
 
-    const rate = velocity + 1;
+    const rate = velocity + 0.5;
     this.setState({ velocity: rate, rate, paused: false });
   };
 
   minus = () => {
     const { velocity } = this.state;
+
     if (velocity > 1) {
-      // this.state({ velocity: velocity - 1 });
-      const rate = velocity - 1;
+      const rate = velocity - 0.5;
       this.setState({ velocity: rate, rate, paused: false });
     }
   };
@@ -134,6 +157,7 @@ export default class Player extends Component<Props> {
       indexSelected,
       isLoading,
       velocity,
+      timeCurrent,
     } = this.state;
     const {
       modalVisible,
@@ -144,7 +168,6 @@ export default class Player extends Component<Props> {
       listSounds,
       position,
     } = this.props;
-    console.warn('title', listSounds[indexSelected]);
 
     return (
       <View style={styles.container}>
@@ -181,6 +204,9 @@ export default class Player extends Component<Props> {
           }}
           onLoad={data => {
             this.onLoad(data);
+          }}
+          onEnd={data => {
+            this.onEnd();
           }}
           onLoadStart={this.onLoadStart}
           playWhenInactive
@@ -227,6 +253,17 @@ export default class Player extends Component<Props> {
           onValueChange={this.onSongSliderChange}
           value={progress}
         />
+        <View
+          style={{
+            flexDirection: 'row',
+            width: '80%',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Text>{`${timeCurrent === 0 ? '0:00' : `${timeCurrent}`}`}</Text>
+          <Text>0:00</Text>
+        </View>
+
         <View style={styles.containerControls}>
           <TouchableOpacity onPress={this.back}>
             <Image source={this.backIcon} style={{ height: 40, width: 40 }} />
@@ -270,10 +307,6 @@ export default class Player extends Component<Props> {
           <TouchableOpacity onPress={this.plus}>
             <Image source={this.plusIcon} style={{ height: 10, width: 10 }} />
           </TouchableOpacity>
-          {/* 
-          <Button onPress={() => this.rate(1)} title="1x"></Button>
-          <Button onPress={() => this.rate(1.5)} title="1.5x"></Button>
-          <Button onPress={() => this.rate(2)} title="2x"></Button> */}
         </View>
       </View>
     );

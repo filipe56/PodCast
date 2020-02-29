@@ -21,7 +21,11 @@ export default class ListPodCast extends Component {
         date: '20 de dezembro de 2019',
         time: '53:20',
         image: imagePodCast,
-        sound: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4',
+        sound:
+          'https://m.toqueparacelular.com.br/d01/Mortal_Kombat_PUNYASO_EDM_RmX.mp3',
+        //'http://www.gospelminds.com/wp-content/uploads/2018/10/HillsongUnited-Oceans-Where-Feet-May-Fail-.mp3?_=1',
+        //'http://techslides.com/demos/sample-videos/small.mp4',
+        //'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4',
         uri: uri,
       },
       {
