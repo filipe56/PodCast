@@ -23,7 +23,7 @@ const Controls = ({
           styles.secondaryControl,
           shuffleOn ? [] : styles.off,
         ]}
-        source={require('../img/ic_shuffle_white.png')}
+        source={require(' ../img/ic_shuffle_white.png')}
       />
     </TouchableOpacity>
     <View style={{ width: 40 }} />

@@ -1,7 +1,7 @@
 import { createStackNavigator } from 'react-navigation';
-import Player from '../screens/Player';
-import ListPodCast from '../screens/ListPodCast';
-import ListSound from '../screens/ListSound';
+import Player from '../screens/Player/Player';
+import ListPodCast from '../screens/ListPodCast/ListPodCast';
+import ListSound from '../screens/ListSound/ListSound';
 
 const HomeInNavigator = createStackNavigator({
   ListPodCast: {

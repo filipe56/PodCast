@@ -100,8 +100,6 @@ export default class Player extends Component {
 
     return (
       <View style={styles.container}>
-        {/* <StatusBar hidden={true} /> */}
-        {/* <Header message="Playing From Charts" /> */}
         <AlbumArt url={track.albumArtUrl} />
         <TrackDetails title={track.title} artist={track.artist} />
         <SeekBar
